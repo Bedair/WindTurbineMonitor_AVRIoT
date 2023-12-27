@@ -12,13 +12,15 @@
 /**********************************************************************
 *                            Include Section                          *
 **********************************************************************/
-#include <Arduino.h>
-#include <log.h>
-
-
-#include "UserApp.h"
 #include "App_Vibration.h"
 
+
+#include <Arduino.h>
+#include <log.h>
+#include <Wire.h>
+
+
+#include "MPU6050.h"
 
 
 
@@ -31,85 +33,45 @@
 /**********************************************************************
 *                           Local Functions                           *
 **********************************************************************/
-/*
-* Funcation Name : UserApp_Log_Init
-* Description    : Used to initialize the log Module (Baud Rate and Log level)
-* Parameters     : NA
-* Return         : NA
-*/
-static void UserApp_Log_Init(void);
 
-
-
-
-
-static void UserApp_Log_Init(void)
-{
-    Log.begin(115200);
-    Log.setLogLevel(LogLevel::INFO);
-}
 
 
 /**********************************************************************
 *                          Global Variables                           *
 **********************************************************************/ 
-
+MPU6050 mpu;
 
 /**********************************************************************
 *                          Global Functions                           *
 **********************************************************************/
 
 /*
-* Funcation Name : UserApp_Init
-* Description    : Initializtion task for the user application
-                 : used to initialize all the needed libraries
+* Funcation Name : App_Vibration_Init
+* Description    : Initialize the Vibration component by initializing 
+                 : the MPU and calculate the baseline
 * Parameters     : NA
 * Return         : NA
 */
-void UserApp_Init(void)
+void App_Vibration_Init(void)
 {
-    UserApp_Log_Init();
 
-    App_Vibration_Init();
-
+    //Log.info("Vibration Init");
+    mpu.begin(0x68, &Wire1);
     
 }
 
 
 /*
-* Funcation Name : UserApp_Vibration_Processing_Task
-* Description    : Periodic task to read and process Vibration
+* Funcation Name : App_Vibration_Get_State
+* Description    : Used to read the Accel data and check for Vibration
 * Parameters     : NA
 * Return         : NA
 */
-void UserApp_Vibration_Processing_Task(void)
-{
-    //Log.info("Vibration Processing Task");
-    App_Vibration_Get_State();
-}
-
-
-/*
-* Funcation Name : UserApp_Data_Send_Task
-* Description    : Periodic task to collect and send data 
-* Parameters     : NA
-* Return         : NA
-*/
-void UserApp_Data_Send_Task(void)
-{
-    //Log.info("Data Send Task");
-}
-
-
-/*
-* Funcation Name : UserApp_Motor_Encoder_Callback
-* Description    : Callback when MC pin detects Raising Edge
-* Parameters     : NA
-* Return         : NA
-*/
-void UserApp_Motor_Encoder_Callback(void)
+Vibration_State_T App_Vibration_Get_State(void)
 {
 
-}
+    //Log.info("Vibration Get State");
 
+    return VIBRATION;
+}
 
