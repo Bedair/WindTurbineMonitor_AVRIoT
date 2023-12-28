@@ -12,15 +12,30 @@
 #include "MPU6050.h"
 
 
-#define MPU60X0_ACCELR_MEASUREMENTS_ADDRESS             (0x3B)
 
-#define MPU60X0_GYRO_MEASUREMENTS_ADDRESS               (0x43)
+
 #define MPU60X0_GYRO_CONFIG_ADDRESS                     (0x1B)
 #define MPU60X0_ACCEL_CONFIG_ADDRESS                    (0x1C)
-#define MPU60X0_PWR_MGMT_1_ADDRESS                      (0x6B)
 
+#define MPU60X0_ACCEL_MEASUREMENTS_X_HIGH               (0x3B)
+#define MPU60X0_ACCEL_MEASUREMENTS_X_LOW                (0x3C)
+#define MPU60X0_ACCEL_MEASUREMENTS_Y_HIGH               (0x3D)
+#define MPU60X0_ACCEL_MEASUREMENTS_Y_LOW                (0x3E)
+#define MPU60X0_ACCEL_MEASUREMENTS_Z_HIGH               (0x3F)
+#define MPU60X0_ACCEL_MEASUREMENTS_Z_LOW                (0x40)
 #define MPU60X0_TEMPERATURE_MEASUREMENTS_HIGH           (0x41)
 #define MPU60X0_TEMPERATURE_MEASUREMENTS_LOW            (0x42)
+#define MPU60X0_GYRO_MEASUREMENTS_X_HIGH                (0x43)
+#define MPU60X0_GYRO_MEASUREMENTS_X_LOW                 (0x44)
+#define MPU60X0_GYRO_MEASUREMENTS_Y_HIGH                (0x45)
+#define MPU60X0_GYRO_MEASUREMENTS_Y_LOW                 (0x46)
+#define MPU60X0_GYRO_MEASUREMENTS_Z_HIGH                (0x47)
+#define MPU60X0_GYRO_MEASUREMENTS_Z_LOW                 (0x48)
+
+#define MPU60X0_PWR_MGMT_1_ADDRESS                      (0x6B)
+
+
+
 
 MPU6050::MPU6050() {}
 MPU6050::~MPU6050() {}
@@ -44,13 +59,39 @@ void MPU6050::begin(uint8_t i2c_address, TwoWire *i2c_bus)
 
 void MPU6050::Read_Gyro (SensorData_t* gyro)
 {
+    uint8_t High_Byte = 0;
+    uint8_t Low_Byte = 0;
     
+    High_Byte = this->ReadReg(MPU60X0_GYRO_MEASUREMENTS_X_HIGH);
+    Low_Byte = this->ReadReg(MPU60X0_GYRO_MEASUREMENTS_X_LOW);
+    gyro->X = (((int16_t)High_Byte) << 8) | Low_Byte;
+
+    High_Byte = this->ReadReg(MPU60X0_GYRO_MEASUREMENTS_Y_HIGH);
+    Low_Byte = this->ReadReg(MPU60X0_GYRO_MEASUREMENTS_Y_LOW);
+    gyro->Y = (((int16_t)High_Byte) << 8) | Low_Byte;
+
+    High_Byte = this->ReadReg(MPU60X0_GYRO_MEASUREMENTS_Z_HIGH);
+    Low_Byte = this->ReadReg(MPU60X0_GYRO_MEASUREMENTS_Z_LOW);
+    gyro->Z = (((int16_t)High_Byte) << 8) | Low_Byte;
 }
 
 
 void MPU6050::Read_Accel(SensorData_t* accel)
 {
-      
+    uint8_t High_Byte = 0;
+    uint8_t Low_Byte = 0;
+
+    High_Byte = this->ReadReg(MPU60X0_ACCEL_MEASUREMENTS_X_HIGH);
+    Low_Byte = this->ReadReg(MPU60X0_ACCEL_MEASUREMENTS_X_LOW);
+    accel->X = (((int16_t)High_Byte) << 8) | Low_Byte;
+
+    High_Byte = this->ReadReg(MPU60X0_ACCEL_MEASUREMENTS_Y_HIGH);
+    Low_Byte = this->ReadReg(MPU60X0_ACCEL_MEASUREMENTS_Y_LOW);
+    accel->Y = (((int16_t)High_Byte) << 8) | Low_Byte;
+
+    High_Byte = this->ReadReg(MPU60X0_ACCEL_MEASUREMENTS_Z_HIGH);
+    Low_Byte = this->ReadReg(MPU60X0_ACCEL_MEASUREMENTS_Z_LOW);
+    accel->Z = (((int16_t)High_Byte) << 8) | Low_Byte;
 }
 
 
@@ -72,13 +113,17 @@ void MPU6050::Read_Temperature(int16_t *temperature)
 
 void MPU6050::MPU60x0_Set_GyroRange(MPU60x0_GyroRange_T range)
 {
-    
+    uint8_t Tx_Data = ((uint8_t)range) << 3;
+
+    this->WriteReg(MPU60X0_GYRO_CONFIG_ADDRESS, Tx_Data);
 }
 
 
 void MPU6050::MPU60x0_Set_AccelRange(MPU60x0_AccelRange_T range)
 {
-    
+    uint8_t Tx_Data = ((uint8_t)range) << 3;
+
+    this->WriteReg(MPU60X0_ACCEL_CONFIG_ADDRESS, Tx_Data);
 }
 
 
