@@ -22,6 +22,20 @@ typedef struct{
     int16_t Z;
 }SensorData_t;
 
+typedef enum{
+    MPU60X0_GYRO_RANGE_250 = 0,
+    MPU60X0_GYRO_RANGE_500,
+    MPU60X0_GYRO_RANGE_1000,
+    MPU60X0_GYRO_RANGE_2000
+}MPU60x0_GyroRange_T;
+
+typedef enum{
+    MPU60X0_ACCEL_RANGE_2 = 0,
+    MPU60X0_ACCEL_RANGE_4,
+    MPU60X0_ACCEL_RANGE_8,
+    MPU60X0_ACCEL_RANGE_16
+}MPU60x0_AccelRange_T;
+
 
 class MPU6050
 {
@@ -32,14 +46,16 @@ class MPU6050
         void begin(uint8_t i2c_address, TwoWire *i2c_bus);
         void Read_Gyro (SensorData_t* gyro);
         void Read_Accel(SensorData_t* accel);
-        void Read_Temperature(int16_t temperature);
+        void Read_Temperature(int16_t* temperature);
+        void MPU60x0_Set_GyroRange(MPU60x0_GyroRange_T range);
+        void MPU60x0_Set_AccelRange(MPU60x0_AccelRange_T range);
 
 
     
 
     private:
-        void ReadReg (uint8_t MemAddress, uint8_t *pData, uint8_t Size);
-        void WriteReg(uint8_t MemAddress, uint8_t *pData, uint8_t Size);
+        uint8_t ReadReg (uint8_t MemAddress);
+        void WriteReg(uint8_t MemAddress, uint8_t data);
 
 
         TwoWire *I2C_Bus;
