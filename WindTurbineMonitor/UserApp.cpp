@@ -53,7 +53,7 @@ static void UserApp_Log_Init(void)
 /**********************************************************************
 *                          Global Variables                           *
 **********************************************************************/ 
-
+static uint16_t Cycle_Vibration_Counter = 0;
 
 /**********************************************************************
 *                          Global Functions                           *
@@ -71,8 +71,6 @@ void UserApp_Init(void)
     UserApp_Log_Init();
 
     App_Vibration_Init();
-
-    
 }
 
 
@@ -84,8 +82,13 @@ void UserApp_Init(void)
 */
 void UserApp_Vibration_Processing_Task(void)
 {
-    //Log.info("Vibration Processing Task");
-    App_Vibration_Get_State();
+    Vibration_State_T vibrationState = NO_VIBRATION;
+    vibrationState = App_Vibration_Get_State();
+
+    if (VIBRATION == vibrationState)
+    {
+        Cycle_Vibration_Counter++;
+    }
 }
 
 
