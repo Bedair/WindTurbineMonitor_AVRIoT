@@ -18,6 +18,7 @@
 
 #include "UserApp.h"
 #include "App_Vibration.h"
+#include "Backend.h"
 
 
 
@@ -26,6 +27,20 @@
 *                            Macro Section                            *
 **********************************************************************/
 
+
+/**********************************************************************
+*                          Global Variables                           *
+**********************************************************************/ 
+static uint16_t Cycle_Vibration_Counter = 0;
+static uint8_t System_Data[5] = {
+    0,      /* Vibration Status */
+    0,      /* MotorRPM */
+    0,      /* Temperature */
+    0,      /* Temperature Failure */
+    0       /* Vibration Failure */
+};
+
+Backend backend;
 
 
 /**********************************************************************
@@ -39,6 +54,14 @@
 */
 static void UserApp_Log_Init(void);
 
+/*
+* Funcation Name : UserApp_BackendLink_Init
+* Description    : Used to initialize the communication to backend
+* Parameters     : NA
+* Return         : NA
+*/
+static void UserApp_BackendLink_Init(void);
+
 
 
 
@@ -49,11 +72,17 @@ static void UserApp_Log_Init(void)
     Log.setLogLevel(LogLevel::INFO);
 }
 
+static void UserApp_BackendLink_Init(void)
+{
+    backend.Connect();
+    while (!backend.isConnected())
+    {
+        Log.info("Connect to Backend ... ");
+    }
 
-/**********************************************************************
-*                          Global Variables                           *
-**********************************************************************/ 
-static uint16_t Cycle_Vibration_Counter = 0;
+    Log.info("Connected to Backend ");
+}
+
 
 /**********************************************************************
 *                          Global Functions                           *
@@ -71,6 +100,11 @@ void UserApp_Init(void)
     UserApp_Log_Init();
 
     App_Vibration_Init();
+
+    //UserApp_BackendLink_Init();
+
+    
+    
 }
 
 
@@ -100,7 +134,13 @@ void UserApp_Vibration_Processing_Task(void)
 */
 void UserApp_Data_Send_Task(void)
 {
-    //Log.info("Data Send Task");
+    System_Data[0] = 0;
+    System_Data[1] = 1;
+    System_Data[2] = 2;
+    System_Data[3] = 3;
+    System_Data[4] = 4;
+    //backend.Send(System_Data, sizeof(System_Data));
+    Log.info("Data Sent to Backend");
 }
 
 
