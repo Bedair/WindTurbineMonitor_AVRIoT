@@ -1,0 +1,279 @@
+[
+    {
+        "id": "c9086704911b7630",
+        "type": "tab",
+        "label": "WindTurbine_GUI",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "ca33c5c297c469c6",
+        "type": "mqtt in",
+        "z": "c9086704911b7630",
+        "name": "",
+        "topic": "WindTurbineState",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "c01a67a70c21be4b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 290,
+        "y": 200,
+        "wires": [
+            [
+                "da69dfc80fd4cbf7"
+            ]
+        ]
+    },
+    {
+        "id": "cb93dfc0a761d01e",
+        "type": "debug",
+        "z": "c9086704911b7630",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "da69dfc80fd4cbf7",
+        "type": "function",
+        "z": "c9086704911b7630",
+        "name": "Parser",
+        "func": "var VibrationState = { payload: msg.payload[0] };\nvar MotorRPM = { payload: msg.payload[1] };\nvar Temperature = { payload: msg.payload[2] };\nvar TemperatureFail = { payload: msg.payload[3] };\nvar VibrationFail = { payload: msg.payload[4] };\n\n\nreturn [VibrationState, MotorRPM, Temperature, TemperatureFail, VibrationFail];",
+        "outputs": 5,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 200,
+        "wires": [
+            [
+                "64aba7fdf86fbd02"
+            ],
+            [
+                "ae8c0d0f3e9cadc3"
+            ],
+            [
+                "aa445e68597aed09"
+            ],
+            [
+                "9417852e8250ed42"
+            ],
+            [
+                "1ac62b4ca95c2176"
+            ]
+        ]
+    },
+    {
+        "id": "64aba7fdf86fbd02",
+        "type": "ui_led",
+        "z": "c9086704911b7630",
+        "order": 0,
+        "group": "3db6e98884bb4d9c",
+        "width": 0,
+        "height": 0,
+        "label": "Vibration State",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "1",
+                "valueType": "num"
+            },
+            {
+                "color": "#808080",
+                "value": "0",
+                "valueType": "num"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "VibrationState",
+        "x": 820,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "ae8c0d0f3e9cadc3",
+        "type": "ui_gauge",
+        "z": "c9086704911b7630",
+        "name": "Motor RPM",
+        "group": "3db6e98884bb4d9c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "MotorRPM",
+        "label": "units",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 830,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "aa445e68597aed09",
+        "type": "ui_gauge",
+        "z": "c9086704911b7630",
+        "name": "Temperature",
+        "group": "3db6e98884bb4d9c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperature",
+        "label": "units",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 830,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "9417852e8250ed42",
+        "type": "ui_led",
+        "z": "c9086704911b7630",
+        "order": 3,
+        "group": "3db6e98884bb4d9c",
+        "width": 0,
+        "height": 0,
+        "label": "Temerature Failure",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "1",
+                "valueType": "num"
+            },
+            {
+                "color": "#808080",
+                "value": "0",
+                "valueType": "num"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "Temerature Failure",
+        "x": 830,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "1ac62b4ca95c2176",
+        "type": "ui_led",
+        "z": "c9086704911b7630",
+        "order": 4,
+        "group": "3db6e98884bb4d9c",
+        "width": 0,
+        "height": 0,
+        "label": "VibrationFailure",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "1",
+                "valueType": "num"
+            },
+            {
+                "color": "#808080",
+                "value": "0",
+                "valueType": "num"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "VibrationFailure",
+        "x": 840,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "c01a67a70c21be4b",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "test.mosquitto.org",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3db6e98884bb4d9c",
+        "type": "ui_group",
+        "name": "GUI",
+        "tab": "17d09b07.741a55",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "17d09b07.741a55",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

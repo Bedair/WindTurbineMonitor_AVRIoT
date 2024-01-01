@@ -14,11 +14,12 @@
 **********************************************************************/
 #include <Arduino.h>
 #include <log.h>
-
+#include <mcp9808.h>
 
 #include "UserApp.h"
 #include "App_Vibration.h"
 #include "Backend.h"
+#include "MotorEnc.h"
 
 
 
@@ -26,12 +27,28 @@
 /**********************************************************************
 *                            Macro Section                            *
 **********************************************************************/
+#define VIBRATION_STATE_BYTE                (0)
+#define MOTOR_SPEED_BYTE                    (1)
+#define TEMPERTURE_VALUE_BYTE               (2)
+#define TEMPERATURE_FAILURE_BYTE            (3)
+#define VIBRATION_FAILURE_BYTE              (4)
 
 
+#define VIBRATION_THRESHOLD                 (10)
+#define TEMPERATURE_THRESHOLD               (50)
+
+
+#define GLOBAL_VIBRATION_THRESHOLD          (10)
+#define GLOBAL_TEMPERATURE_THRESHOLD        (10)
+#define SEND_DATA_EVENTS_PER_MINUTE         (60000 / DATA_SEND_TASK_PERIODICITY)
 /**********************************************************************
 *                          Global Variables                           *
 **********************************************************************/ 
 static uint16_t Cycle_Vibration_Counter = 0;
+
+static uint16_t Global_Vibration_Counter = 0;
+static uint16_t Global_Temperature_Counter = 0;
+
 static uint8_t System_Data[5] = {
     0,      /* Vibration Status */
     0,      /* MotorRPM */
@@ -101,8 +118,16 @@ void UserApp_Init(void)
 
     App_Vibration_Init();
 
-    //UserApp_BackendLink_Init();
+    MotorEnc_Init();
 
+    /* Initialize the Temperature Sensor */
+    int8_t error = Mcp9808.begin(); 
+    if (error) {
+        Log.error("Error: could not start MCP9808 library");
+    }
+
+
+    UserApp_BackendLink_Init();
     
     
 }
@@ -134,12 +159,54 @@ void UserApp_Vibration_Processing_Task(void)
 */
 void UserApp_Data_Send_Task(void)
 {
-    System_Data[0] = 0;
-    System_Data[1] = 1;
-    System_Data[2] = 2;
-    System_Data[3] = 3;
-    System_Data[4] = 4;
-    //backend.Send(System_Data, sizeof(System_Data));
+    /* Update the Vibration State*/
+    if (Cycle_Vibration_Counter > VIBRATION_THRESHOLD)
+    {
+        System_Data[VIBRATION_STATE_BYTE] = true;
+
+        Global_Vibration_Counter++;
+        if (Global_Vibration_Counter > GLOBAL_VIBRATION_THRESHOLD)
+        {
+            System_Data[VIBRATION_FAILURE_BYTE] = true;
+        }
+        else
+        {
+            System_Data[VIBRATION_FAILURE_BYTE] = false;
+        }
+        
+    }
+    else
+    {
+        System_Data[VIBRATION_STATE_BYTE] = false;
+    }
+    Cycle_Vibration_Counter = 0;
+    
+
+    /* Update the Motor Speed */
+    System_Data[MOTOR_SPEED_BYTE] = (uint8_t)(MotorEnc_Get_Event_Count() * SEND_DATA_EVENTS_PER_MINUTE/ MOTOR_COUNTS_PER_CYCLE);;
+
+
+
+    /* Update the Temperature */
+    float celsius = Mcp9808.readTempC();
+    System_Data[TEMPERTURE_VALUE_BYTE] = (uint8_t)celsius;
+    if (celsius > TEMPERATURE_THRESHOLD)
+    {
+        Global_Temperature_Counter++;
+        if (Global_Temperature_Counter > GLOBAL_TEMPERATURE_THRESHOLD)
+        {
+            System_Data[TEMPERATURE_FAILURE_BYTE] = true;
+        }
+        else
+        {
+            System_Data[TEMPERATURE_FAILURE_BYTE] = false;
+        }
+    }
+    
+    
+    MotorEnc_Reset_Event_Count();
+
+    backend.Send(System_Data, sizeof(System_Data));
     Log.info("Data Sent to Backend");
 }
 
